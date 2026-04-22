@@ -132,3 +132,4 @@ X_FRAME_OPTIONS = 'DENY'
 
 # Default primary key
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
