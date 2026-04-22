@@ -1,0 +1,203 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Register - EcoSecure Shop{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        background: rgba(255, 255, 255, 0.82) !important;
+        border: 1px solid rgba(200, 188, 170, 0.3) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 2px 12px rgba(26, 58, 42, 0.10) !important;
+        padding: 2.5rem 2.25rem !important;
+    }
+
+    .card h2 {
+        font-family: 'Cormorant Garamond', serif;
+        font-weight: 600;
+        font-size: 2rem;
+        color: var(--eco-forest);
+        letter-spacing: 0.01em;
+        margin-bottom: 1.75rem;
+    }
+
+    .card .alert-warning {
+        background-color: #fdf3e3 !important;
+        border: 1px solid rgba(196, 169, 122, 0.35) !important;
+        border-left: 3px solid var(--eco-sand) !important;
+        color: var(--eco-bark) !important;
+        border-radius: 8px !important;
+        font-size: 0.875rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .card .form-label,
+    .card label {
+        display: block;
+        font-size: 0.75rem;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--eco-stone);
+        font-weight: 400;
+        margin-bottom: 0.35rem;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .card input[type="text"],
+    .card input[type="email"],
+    .card input[type="password"] {
+        display: block;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        border: 1px solid rgba(164, 150, 130, 0.35) !important;
+        border-radius: 8px !important;
+        color: var(--eco-charcoal) !important;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.9rem !important;
+        font-weight: 300;
+        padding: 0.65rem 0.9rem !important;
+        transition: border-color 200ms cubic-bezier(0.4,0,0.2,1),
+                    box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .card input[type="text"]:focus,
+    .card input[type="email"]:focus,
+    .card input[type="password"]:focus {
+        background-color: #fff !important;
+        border-color: var(--eco-sage) !important;
+        box-shadow: 0 0 0 3px rgba(74, 124, 95, 0.15) !important;
+    }
+
+    .card .helptext,
+    .card ul.errorlist,
+    .card .form-text {
+        font-size: 0.78rem;
+        color: var(--eco-stone);
+        margin-top: 0.35rem;
+        font-family: 'DM Sans', sans-serif;
+        line-height: 1.5;
+        list-style: none;
+        padding: 0;
+    }
+
+    .card ul.errorlist li {
+        color: #8b3a2a;
+        font-size: 0.78rem;
+        margin-top: 0.3rem;
+    }
+
+    .card .btn-success {
+        background-color: var(--eco-moss) !important;
+        border-color: var(--eco-moss) !important;
+        border-radius: 999px !important;
+        font-size: 0.82rem !important;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        font-weight: 400;
+        font-family: 'DM Sans', sans-serif;
+        padding: 0.65rem 1.5rem !important;
+        color: #fff !important;
+        width: 100%;
+        margin-top: 0.75rem;
+        cursor: pointer;
+        transition: background 200ms cubic-bezier(0.4,0,0.2,1),
+                    box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
+        border: none;
+    }
+
+    .card .btn-success:hover,
+    .card .btn-success:focus {
+        background-color: var(--eco-forest) !important;
+        box-shadow: 0 4px 14px rgba(26, 58, 42, 0.28) !important;
+    }
+
+    .card p,
+    .card .text-center {
+        font-size: 0.875rem;
+        color: var(--eco-stone);
+    }
+
+    .card a {
+        color: var(--eco-sage);
+        text-decoration: none;
+        transition: color 200ms cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .card a:hover {
+        color: var(--eco-forest);
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card shadow-sm p-4">
+                <h2 class="text-center mb-4">Create Account</h2>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Please fix the following errors:</strong>
+                        <ul class="mb-0 mt-2">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
+                        {{ form.password1 }}
+                        {% if form.password1.help_text %}
+                            <div class="form-text small text-muted">
+                                {{ form.password1.help_text|safe }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">Password Confirmation</label>
+                        {{ form.password2 }}
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Register</button>
+                </form>
+
+                <p class="text-center mt-3 mb-0">
+                    Already have an account?
+                    <a href="{% url 'login' %}">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

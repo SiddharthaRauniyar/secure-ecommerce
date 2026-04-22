@@ -1,0 +1,294 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Cart - EcoSecure Shop{% endblock %}
+
+{% block content %}
+
+<style>
+    .cart-heading {
+        font-family: 'Cormorant Garamond', serif;
+        font-weight: 600;
+        font-size: 2rem;
+        color: var(--eco-forest);
+        letter-spacing: 0.01em;
+        margin-bottom: 1.5rem;
+    }
+
+    .cart-card {
+        background: rgba(255, 255, 255, 0.82) !important;
+        border: 1px solid rgba(200, 188, 170, 0.3) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 2px 12px rgba(26, 58, 42, 0.10);
+        padding: 1.75rem !important;
+    }
+
+    .cart-card .table thead th {
+        font-size: 0.72rem !important;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--eco-stone) !important;
+        font-weight: 400 !important;
+        border-bottom: 1px solid rgba(164, 150, 130, 0.25) !important;
+        padding-bottom: 0.75rem;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .cart-card .table tbody td {
+        color: var(--eco-charcoal);
+        font-size: 0.9rem;
+        font-family: 'DM Sans', sans-serif;
+        font-weight: 300;
+        border-bottom: 1px solid rgba(164, 150, 130, 0.12) !important;
+        vertical-align: middle;
+        padding: 0.9rem 0.6rem;
+    }
+
+    .cart-card .table tbody tr:last-child td {
+        border-bottom: none !important;
+    }
+
+    .cart-card .product-name {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--eco-forest);
+    }
+
+    .cart-card .price-cell {
+        color: var(--eco-bark);
+        font-weight: 400;
+    }
+
+    .cart-card .subtotal-cell {
+        color: var(--eco-forest);
+        font-weight: 500;
+    }
+
+    .cart-card input[type="number"] {
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        border: 1px solid rgba(164, 150, 130, 0.35) !important;
+        border-radius: 8px !important;
+        color: var(--eco-charcoal) !important;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.88rem !important;
+        font-weight: 300;
+        padding: 0.5rem 0.75rem !important;
+        transition: border-color 200ms cubic-bezier(0.4,0,0.2,1),
+                    box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
+        outline: none;
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 0.5rem;
+    }
+
+    .cart-card input[type="number"]:focus {
+        background-color: #fff !important;
+        border-color: var(--eco-sage) !important;
+        box-shadow: 0 0 0 3px rgba(74, 124, 95, 0.15) !important;
+    }
+
+    .cart-card .btn-update {
+        background-color: var(--eco-bark) !important;
+        border-color: var(--eco-bark) !important;
+        border-radius: 999px !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        font-weight: 400;
+        font-family: 'DM Sans', sans-serif;
+        padding: 0.35rem 0.85rem !important;
+        color: #fff !important;
+        width: 100%;
+        cursor: pointer;
+        transition: background 200ms cubic-bezier(0.4,0,0.2,1);
+        border: none;
+    }
+
+    .cart-card .btn-update:hover {
+        background-color: #5e4428 !important;
+    }
+
+    .cart-card .btn-remove {
+        background-color: transparent !important;
+        border: 1px solid rgba(139, 58, 42, 0.35) !important;
+        border-radius: 999px !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        font-weight: 400;
+        font-family: 'DM Sans', sans-serif;
+        padding: 0.35rem 0.85rem !important;
+        color: #8b3a2a !important;
+        cursor: pointer;
+        transition: all 200ms cubic-bezier(0.4,0,0.2,1);
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .cart-card .btn-remove:hover {
+        background-color: #8b3a2a !important;
+        border-color: #8b3a2a !important;
+        color: #fff !important;
+    }
+
+    .cart-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.25rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid rgba(164, 150, 130, 0.2);
+    }
+
+    .cart-footer .btn-continue {
+        background: transparent !important;
+        border: 1px solid rgba(164, 150, 130, 0.45) !important;
+        border-radius: 999px !important;
+        font-size: 0.78rem !important;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        font-weight: 400;
+        font-family: 'DM Sans', sans-serif;
+        padding: 0.5rem 1.25rem !important;
+        color: var(--eco-stone) !important;
+        text-decoration: none;
+        transition: all 200ms cubic-bezier(0.4,0,0.2,1);
+        display: inline-block;
+    }
+
+    .cart-footer .btn-continue:hover {
+        background: rgba(164, 150, 130, 0.12) !important;
+        border-color: var(--eco-stone) !important;
+        color: var(--eco-charcoal) !important;
+    }
+
+    .cart-footer .btn-checkout {
+        background-color: var(--eco-moss) !important;
+        border-color: var(--eco-moss) !important;
+        border-radius: 999px !important;
+        font-size: 0.78rem !important;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        font-weight: 400;
+        font-family: 'DM Sans', sans-serif;
+        padding: 0.5rem 1.5rem !important;
+        color: #fff !important;
+        text-decoration: none;
+        transition: background 200ms cubic-bezier(0.4,0,0.2,1),
+                    box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
+        display: inline-block;
+    }
+
+    .cart-footer .btn-checkout:hover {
+        background-color: var(--eco-forest) !important;
+        box-shadow: 0 4px 14px rgba(26, 58, 42, 0.28) !important;
+    }
+
+    .cart-total {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--eco-forest);
+        letter-spacing: 0.01em;
+    }
+
+    .cart-total span {
+        color: var(--eco-bark);
+    }
+
+    .empty-cart-card {
+        background: rgba(255, 255, 255, 0.82) !important;
+        border: 1px solid rgba(200, 188, 170, 0.3) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 2px 12px rgba(26, 58, 42, 0.10);
+        padding: 2.5rem 2rem !important;
+        text-align: center;
+    }
+
+    .empty-cart-card p {
+        color: var(--eco-stone);
+        font-size: 0.95rem;
+        font-family: 'DM Sans', sans-serif;
+        font-weight: 300;
+        margin-bottom: 1.25rem;
+    }
+
+    .empty-cart-card .btn-browse {
+        background-color: var(--eco-moss) !important;
+        border-color: var(--eco-moss) !important;
+        border-radius: 999px !important;
+        font-size: 0.82rem !important;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        font-weight: 400;
+        font-family: 'DM Sans', sans-serif;
+        padding: 0.6rem 1.75rem !important;
+        color: #fff !important;
+        text-decoration: none;
+        transition: background 200ms cubic-bezier(0.4,0,0.2,1),
+                    box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
+        display: inline-block;
+    }
+
+    .empty-cart-card .btn-browse:hover {
+        background-color: var(--eco-forest) !important;
+        box-shadow: 0 4px 14px rgba(26, 58, 42, 0.28) !important;
+    }
+</style>
+
+<h2 class="cart-heading">Your Cart</h2>
+
+{% if items %}
+    <div class="cart-card">
+        <div class="table-responsive">
+            <table class="table mt-2">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th style="width: 150px;">Quantity</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td><span class="product-name">{{ item.product.name }}</span></td>
+                        <td><span class="price-cell">${{ item.product.price }}</span></td>
+                        <td>
+                            <form method="POST" action="{% url 'update_cart' item.id %}">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
+                                <button type="submit" class="btn-update">Update</button>
+                            </form>
+                        </td>
+                        <td><span class="subtotal-cell">${{ item.subtotal }}</span></td>
+                        <td>
+                            <a href="{% url 'remove_from_cart' item.id %}" class="btn-remove">Remove</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cart-footer">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'home' %}" class="btn-continue">Continue Shopping</a>
+                <a href="{% url 'checkout' %}" class="btn-checkout">Proceed to Checkout</a>
+            </div>
+            <p class="cart-total mb-0">Total: <span>${{ total }}</span></p>
+        </div>
+    </div>
+
+{% else %}
+    <div class="empty-cart-card">
+        <p>Your cart is empty.</p>
+        <a href="{% url 'home' %}" class="btn-browse">Browse Products</a>
+    </div>
+{% endif %}
+
+{% endblock %}

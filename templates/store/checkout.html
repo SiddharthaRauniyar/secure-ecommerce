@@ -1,0 +1,214 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Checkout - EcoSecure Shop{% endblock %}
+
+{% block content %}
+
+<style>
+    .checkout-heading {
+        font-family: 'Cormorant Garamond', serif;
+        font-weight: 600;
+        font-size: 2rem;
+        color: var(--eco-forest);
+        letter-spacing: 0.01em;
+        margin-bottom: 1.5rem;
+    }
+
+    .checkout-card {
+        background: rgba(255, 255, 255, 0.82) !important;
+        border: 1px solid rgba(200, 188, 170, 0.3) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 2px 12px rgba(26, 58, 42, 0.10);
+        padding: 2rem 2rem !important;
+    }
+
+    .checkout-card h4 {
+        font-family: 'Cormorant Garamond', serif;
+        font-weight: 600;
+        font-size: 1.35rem;
+        color: var(--eco-forest);
+        letter-spacing: 0.01em;
+        margin-bottom: 1.25rem;
+    }
+
+    .checkout-card .form-label,
+    .checkout-card label {
+        display: block;
+        font-size: 0.75rem;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--eco-stone);
+        font-weight: 400;
+        margin-bottom: 0.35rem;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .checkout-card textarea {
+        display: block;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        border: 1px solid rgba(164, 150, 130, 0.35) !important;
+        border-radius: 10px !important;
+        color: var(--eco-charcoal) !important;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.9rem !important;
+        font-weight: 300;
+        padding: 0.7rem 0.9rem !important;
+        line-height: 1.7;
+        resize: vertical;
+        transition: border-color 200ms cubic-bezier(0.4,0,0.2,1),
+                    box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .checkout-card textarea:focus {
+        background-color: #fff !important;
+        border-color: var(--eco-sage) !important;
+        box-shadow: 0 0 0 3px rgba(74, 124, 95, 0.15) !important;
+    }
+
+    .checkout-card textarea::placeholder {
+        color: rgba(138, 130, 120, 0.55);
+        font-size: 0.875rem;
+    }
+
+    .btn-place-order {
+        background-color: var(--eco-moss) !important;
+        border: none !important;
+        border-radius: 999px !important;
+        font-size: 0.82rem !important;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        font-weight: 400;
+        font-family: 'DM Sans', sans-serif;
+        padding: 0.65rem 2rem !important;
+        color: #fff !important;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        transition: background 200ms cubic-bezier(0.4,0,0.2,1),
+                    box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
+        display: inline-block;
+    }
+
+    .btn-place-order:hover,
+    .btn-place-order:focus {
+        background-color: var(--eco-forest) !important;
+        box-shadow: 0 4px 14px rgba(26, 58, 42, 0.28) !important;
+    }
+
+    .summary-card {
+        background: rgba(212, 230, 219, 0.22) !important;
+        border: 1px solid rgba(74, 124, 95, 0.18) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 2px 12px rgba(26, 58, 42, 0.08);
+        padding: 2rem !important;
+    }
+
+    .summary-card h4 {
+        font-family: 'Cormorant Garamond', serif;
+        font-weight: 600;
+        font-size: 1.35rem;
+        color: var(--eco-forest);
+        letter-spacing: 0.01em;
+        margin-bottom: 1.25rem;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid rgba(74, 124, 95, 0.12);
+        gap: 1rem;
+    }
+
+    .summary-item:last-of-type {
+        border-bottom: none;
+    }
+
+    .summary-item .item-name {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 300;
+        color: var(--eco-charcoal);
+    }
+
+    .summary-item .item-qty {
+        font-size: 0.78rem;
+        color: var(--eco-stone);
+        letter-spacing: 0.03em;
+    }
+
+    .summary-item .item-price {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: var(--eco-bark);
+        white-space: nowrap;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+        border-top: 1px solid rgba(74, 124, 95, 0.22);
+    }
+
+    .summary-total .total-label {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--eco-forest);
+        letter-spacing: 0.01em;
+    }
+
+    .summary-total .total-value {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--eco-forest);
+        letter-spacing: 0.01em;
+    }
+</style>
+
+<h2 class="checkout-heading">Checkout</h2>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="checkout-card">
+            <h4>Shipping Details</h4>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Shipping Address</label>
+                    <textarea name="address" rows="5" placeholder="Enter your full shipping address" required></textarea>
+                </div>
+                <button type="submit" class="btn-place-order">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="summary-card">
+            <h4>Order Summary</h4>
+            {% for item in items %}
+                <div class="summary-item">
+                    <span class="item-name">
+                        {{ item.product.name }}
+                        <span class="item-qty">&nbsp;×{{ item.quantity }}</span>
+                    </span>
+                    <span class="item-price">${{ item.subtotal }}</span>
+                </div>
+            {% endfor %}
+            <div class="summary-total">
+                <span class="total-label">Total</span>
+                <span class="total-value">${{ total }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

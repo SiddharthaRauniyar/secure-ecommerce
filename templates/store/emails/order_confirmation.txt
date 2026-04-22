@@ -1,0 +1,12 @@
+Hello {{ user.username }},
+
+Thank you for your order at EcoSecure Shop.
+
+Order ID: #{{ order.id }}
+Total Amount: ${{ order.total_amount }}
+Status: {{ order.status }}
+
+Your order has been placed successfully.
+
+Thank you,
+EcoSecure Shop

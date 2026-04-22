@@ -1,0 +1,9 @@
+Hello {{ user.username }},
+
+Your order status has been updated.
+
+Order ID: #{{ order.id }}
+New Status: {{ order.status }}
+
+Thank you,
+EcoSecure Shop

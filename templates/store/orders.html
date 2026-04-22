@@ -1,0 +1,44 @@
+{% extends 'store/base.html' %}
+
+{% block title %}My Orders - EcoSecure Shop{% endblock %}
+
+{% block content %}
+<h2 class="mb-4 fw-bold">Your Orders</h2>
+
+{% for order in orders %}
+    <div class="card page-card p-4 mb-3">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-3">
+                <strong>Order ID:</strong> #{{ order.id }}
+            </div>
+            <div class="col-md-3">
+                <strong>Total:</strong> ${{ order.total_amount }}
+            </div>
+            <div class="col-md-2">
+                <strong>Status:</strong>
+                {% if order.status == 'Completed' %}
+                    <span class="badge bg-success">{{ order.status }}</span>
+                {% elif order.status == 'Cancelled' %}
+                    <span class="badge bg-danger">{{ order.status }}</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">{{ order.status }}</span>
+                {% endif %}
+            </div>
+            <div class="col-md-2">
+                <strong>Date:</strong> {{ order.created_at|date:"d M Y" }}
+            </div>
+            <div class="col-md-2">
+                {% if order.status == 'Pending' %}
+                    <a href="{% url 'cancel_order' order.id %}" class="btn btn-outline-danger btn-sm">
+                        Cancel Order
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <div class="card page-card p-4">
+        <p class="mb-0">No orders yet.</p>
+    </div>
+{% endfor %}
+{% endblock %}
