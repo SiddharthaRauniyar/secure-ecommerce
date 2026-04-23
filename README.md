@@ -114,20 +114,6 @@ python3 manage.py runserver
 
 ---
 
-## 📸 Screenshots
-
-(Add screenshots here in GitHub or your report)
-
-- Homepage  
-- Product page  
-- Cart page (auto update feature)  
-- Checkout page  
-- Order confirmation  
-- Order history  
-- Admin dashboard  
-
----
-
 ## 🎯 Project Status
 - Completed  
 - Fully functional  
@@ -137,4 +123,4 @@ python3 manage.py runserver
 ---
 
 ## 👨‍💻 Author
-Siddhartha Gupta  
+Siddhartha Gupta
