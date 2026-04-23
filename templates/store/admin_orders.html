@@ -1,60 +1,187 @@
 {% extends 'store/base.html' %}
 
-{% block content %}
-<div class="container py-4">
+{% block title %}Manage Orders - EcoSecure Shop{% endblock %}
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h2 class="mb-0">Manage Orders</h2>
+{% block content %}
+<style>
+    .orders-shell {
+        padding: 1rem 0 2rem;
+    }
+
+    .orders-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
+    .orders-title {
+        margin: 0;
+        font-size: 2rem;
+    }
+
+    .orders-subtitle {
+        margin: 0.25rem 0 0;
+        color: var(--eco-stone);
+        font-size: 0.95rem;
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        border-radius: 20px;
+        box-shadow: 0 12px 30px rgba(26, 58, 42, 0.10);
+    }
+
+    .orders-panel {
+        padding: 1.25rem;
+    }
+
+    .orders-table {
+        margin-bottom: 0;
+    }
+
+    .orders-table thead th {
+        font-size: 0.74rem !important;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--eco-stone) !important;
+        border-top: 0 !important;
+        background: transparent !important;
+        white-space: nowrap;
+    }
+
+    .orders-table tbody td {
+        vertical-align: middle;
+    }
+
+    .order-id {
+        font-weight: 700;
+        color: var(--eco-forest);
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 0.38rem 0.8rem;
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .status-pending {
+        background: rgba(240, 196, 25, 0.18);
+        color: #8a6a00;
+    }
+
+    .status-completed {
+        background: rgba(45, 90, 61, 0.16);
+        color: var(--eco-moss);
+    }
+
+    .status-cancelled {
+        background: rgba(139, 58, 42, 0.14);
+        color: #8b3a2a;
+    }
+
+    .address-cell {
+        min-width: 220px;
+        max-width: 260px;
+        white-space: normal;
+        line-height: 1.45;
+        color: var(--eco-charcoal);
+    }
+
+    .date-cell {
+        white-space: nowrap;
+        color: var(--eco-stone);
+        font-size: 0.9rem;
+    }
+
+    .update-form {
+        min-width: 210px;
+    }
+
+    .update-form .form-select {
+        min-width: 130px;
+    }
+
+    .soft-note {
+        color: var(--eco-stone);
+        font-size: 0.92rem;
+    }
+
+    @media (max-width: 768px) {
+        .orders-title {
+            font-size: 1.6rem;
+        }
+
+        .orders-panel {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<div class="container orders-shell">
+
+    <div class="orders-topbar">
+        <div>
+            <h2 class="orders-title">Manage Orders</h2>
+            <p class="orders-subtitle">Review customer orders, shipping addresses, and update order status.</p>
+        </div>
         <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-dark btn-sm">← Back to Dashboard</a>
     </div>
 
-    <!-- Table Card -->
-    <div class="card shadow-sm p-3">
+    <div class="glass-panel orders-panel">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
-
-                <thead class="table-light">
+            <table class="table table-hover align-middle orders-table">
+                <thead>
                     <tr>
                         <th>ID</th>
                         <th>User</th>
                         <th>Status</th>
                         <th>Total</th>
+                        <th>Shipping Address</th>
                         <th>Date</th>
                         <th>Update</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {% for order in orders %}
                     <tr>
+                        <td class="order-id">#{{ order.id }}</td>
 
-                        <!-- Order ID -->
-                        <td><strong>#{{ order.id }}</strong></td>
-
-                        <!-- User -->
                         <td>{{ order.user.username }}</td>
 
-                        <!-- Status Badge -->
                         <td>
                             {% if order.status == 'Pending' %}
-                                <span class="badge bg-warning text-dark">Pending</span>
+                                <span class="status-pill status-pending">Pending</span>
                             {% elif order.status == 'Completed' %}
-                                <span class="badge bg-success">Completed</span>
+                                <span class="status-pill status-completed">Completed</span>
                             {% else %}
-                                <span class="badge bg-danger">Cancelled</span>
+                                <span class="status-pill status-cancelled">Cancelled</span>
                             {% endif %}
                         </td>
 
-                        <!-- Total -->
                         <td><strong>£{{ order.total_amount }}</strong></td>
 
-                        <!-- Date -->
-                        <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                        <td class="address-cell">
+                            {{ order.shipping_address }}
+                        </td>
 
-                        <!-- Update -->
+                        <td class="date-cell">
+                            {{ order.created_at|date:"Y-m-d H:i" }}
+                        </td>
+
                         <td>
-                            <form method="POST" action="{% url 'update_order_status' order.id %}">
+                            <form method="POST" action="{% url 'update_order_status' order.id %}" class="update-form">
                                 {% csrf_token %}
                                 <div class="d-flex gap-2 flex-wrap">
                                     <select name="status" class="form-select form-select-sm">
@@ -66,11 +193,15 @@
                                 </div>
                             </form>
                         </td>
-
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center soft-note py-4">
+                            No orders available yet.
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
-
             </table>
         </div>
     </div>
