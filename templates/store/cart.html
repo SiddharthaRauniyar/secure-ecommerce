@@ -47,11 +47,40 @@
         border-bottom: none !important;
     }
 
+    .cart-product-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 220px;
+    }
+
+    .cart-product-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid rgba(164, 150, 130, 0.18);
+        background: #fff;
+        flex-shrink: 0;
+    }
+
+    .cart-product-info {
+        display: flex;
+        flex-direction: column;
+    }
+
     .cart-card .product-name {
         font-family: 'Cormorant Garamond', serif;
         font-size: 1.05rem;
         font-weight: 600;
         color: var(--eco-forest);
+        line-height: 1.2;
+    }
+
+    .cart-product-category {
+        font-size: 0.78rem;
+        color: var(--eco-stone);
+        margin-top: 0.2rem;
     }
 
     .cart-card .price-cell {
@@ -198,6 +227,38 @@
         color: var(--eco-bark);
     }
 
+    .summary-card {
+        margin-top: 1.5rem;
+        background: rgba(255, 255, 255, 0.82) !important;
+        border: 1px solid rgba(200, 188, 170, 0.3) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 2px 12px rgba(26, 58, 42, 0.10);
+        padding: 1.5rem !important;
+        max-width: 420px;
+        margin-left: auto;
+    }
+
+    .summary-card h4 {
+        margin-bottom: 1rem;
+        color: var(--eco-forest);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.7rem;
+        color: var(--eco-charcoal);
+    }
+
+    .summary-row.total-row {
+        border-top: 1px solid rgba(164, 150, 130, 0.2);
+        margin-top: 1rem;
+        padding-top: 1rem;
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: var(--eco-forest);
+    }
+
     .empty-cart-card {
         background: rgba(255, 255, 255, 0.82) !important;
         border: 1px solid rgba(200, 188, 170, 0.3) !important;
@@ -256,8 +317,23 @@
                 <tbody>
                     {% for item in items %}
                     <tr>
-                        <td><span class="product-name">{{ item.product.name }}</span></td>
+                        <td>
+                            <div class="cart-product-box">
+                                {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" class="cart-product-image" alt="{{ item.product.name }}">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/60x60?text=No+Image" class="cart-product-image" alt="No image">
+                                {% endif %}
+
+                                <div class="cart-product-info">
+                                    <span class="product-name">{{ item.product.name }}</span>
+                                    <span class="cart-product-category">{{ item.product.category.name }}</span>
+                                </div>
+                            </div>
+                        </td>
+
                         <td><span class="price-cell">${{ item.product.price }}</span></td>
+
                         <td>
                             <form method="POST" action="{% url 'update_cart' item.id %}">
                                 {% csrf_token %}
@@ -265,7 +341,9 @@
                                 <button type="submit" class="btn-update">Update</button>
                             </form>
                         </td>
+
                         <td><span class="subtotal-cell">${{ item.subtotal }}</span></td>
+
                         <td>
                             <a href="{% url 'remove_from_cart' item.id %}" class="btn-remove">Remove</a>
                         </td>
@@ -281,6 +359,22 @@
                 <a href="{% url 'checkout' %}" class="btn-checkout">Proceed to Checkout</a>
             </div>
             <p class="cart-total mb-0">Total: <span>${{ total }}</span></p>
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <h4>Order Summary</h4>
+        <div class="summary-row">
+            <span>Items Total</span>
+            <span>${{ total }}</span>
+        </div>
+        <div class="summary-row">
+            <span>Shipping</span>
+            <span>Free</span>
+        </div>
+        <div class="summary-row total-row">
+            <span>Grand Total</span>
+            <span>${{ total }}</span>
         </div>
     </div>
 

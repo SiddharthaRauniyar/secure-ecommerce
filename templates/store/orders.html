@@ -3,42 +3,224 @@
 {% block title %}My Orders - EcoSecure Shop{% endblock %}
 
 {% block content %}
-<h2 class="mb-4 fw-bold">Your Orders</h2>
+<style>
+    .orders-page-title {
+        font-size: 2.1rem;
+        margin-bottom: 1.5rem;
+    }
 
-{% for order in orders %}
-    <div class="card page-card p-4 mb-3">
-        <div class="row g-3 align-items-center">
-            <div class="col-md-3">
-                <strong>Order ID:</strong> #{{ order.id }}
+    .order-card {
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .order-header {
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0,0,0,0.08);
+        margin-bottom: 1rem;
+    }
+
+    .order-meta strong {
+        display: block;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--eco-stone);
+        margin-bottom: 0.2rem;
+    }
+
+    .order-meta span,
+    .order-meta div {
+        color: var(--eco-charcoal);
+        font-size: 0.95rem;
+    }
+
+    .order-address-box {
+        background: rgba(255,255,255,0.55);
+        border: 1px solid rgba(164,150,130,0.18);
+        border-radius: 14px;
+        padding: 0.9rem 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .order-address-box h6 {
+        margin-bottom: 0.35rem;
+        font-size: 0.95rem;
+    }
+
+    .order-items-table {
+        margin-bottom: 0;
+    }
+
+    .order-items-table thead th {
+        font-size: 0.74rem !important;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--eco-stone) !important;
+        background: transparent !important;
+        border-top: 0 !important;
+    }
+
+    .order-product-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        min-width: 220px;
+    }
+
+    .order-product-image {
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid rgba(164,150,130,0.18);
+        background: #fff;
+        flex-shrink: 0;
+    }
+
+    .order-product-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .order-product-name {
+        font-weight: 600;
+        color: var(--eco-forest);
+        margin-bottom: 0.15rem;
+    }
+
+    .order-product-desc {
+        font-size: 0.82rem;
+        color: var(--eco-stone);
+        line-height: 1.4;
+    }
+
+    .order-summary-note {
+        color: var(--eco-stone);
+        font-size: 0.92rem;
+    }
+
+    .order-empty-card {
+        border-radius: 18px;
+    }
+
+    @media (max-width: 768px) {
+        .orders-page-title {
+            font-size: 1.7rem;
+        }
+
+        .order-product-cell {
+            min-width: 180px;
+        }
+    }
+</style>
+
+<div class="container py-2">
+    <h2 class="orders-page-title fw-bold">Your Orders</h2>
+
+    {% for order in orders %}
+        <div class="card page-card order-card p-4 mb-4 shadow-sm">
+
+            <!-- Order Header -->
+            <div class="order-header">
+                <div class="row g-3 align-items-start">
+                    <div class="col-md-3 col-sm-6 order-meta">
+                        <strong>Order ID</strong>
+                        <span>#{{ order.id }}</span>
+                    </div>
+
+                    <div class="col-md-3 col-sm-6 order-meta">
+                        <strong>Total</strong>
+                        <span>${{ order.total_amount }}</span>
+                    </div>
+
+                    <div class="col-md-2 col-sm-6 order-meta">
+                        <strong>Status</strong>
+                        <div>
+                            {% if order.status == 'Completed' %}
+                                <span class="badge bg-success">{{ order.status }}</span>
+                            {% elif order.status == 'Cancelled' %}
+                                <span class="badge bg-danger">{{ order.status }}</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ order.status }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-sm-6 order-meta">
+                        <strong>Date</strong>
+                        <span>{{ order.created_at|date:"d M Y" }}</span>
+                    </div>
+
+                    <div class="col-md-2 col-sm-12 text-md-end">
+                        {% if order.status == 'Pending' %}
+                            <a href="{% url 'cancel_order' order.id %}" class="btn btn-outline-danger btn-sm">
+                                Cancel Order
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3">
-                <strong>Total:</strong> ${{ order.total_amount }}
+
+            <!-- Shipping Address -->
+            <div class="order-address-box">
+                <h6>Shipping Address</h6>
+                <div class="order-summary-note">
+                    {{ order.shipping_address }}
+                </div>
             </div>
-            <div class="col-md-2">
-                <strong>Status:</strong>
-                {% if order.status == 'Completed' %}
-                    <span class="badge bg-success">{{ order.status }}</span>
-                {% elif order.status == 'Cancelled' %}
-                    <span class="badge bg-danger">{{ order.status }}</span>
-                {% else %}
-                    <span class="badge bg-warning text-dark">{{ order.status }}</span>
-                {% endif %}
+
+            <!-- Ordered Items -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle order-items-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.orderitem_set.all %}
+                            <tr>
+                                <td>
+                                    <div class="order-product-cell">
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="order-product-image">
+                                        {% else %}
+                                            <img src="https://via.placeholder.com/64x64?text=No+Image" alt="No image" class="order-product-image">
+                                        {% endif %}
+
+                                        <div class="order-product-info">
+                                            <div class="order-product-name">{{ item.product.name }}</div>
+                                            <div class="order-product-desc">
+                                                {{ item.product.description|truncatewords:10 }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>${{ item.unit_price }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ item.subtotal }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center order-summary-note py-3">
+                                    No items found for this order.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="col-md-2">
-                <strong>Date:</strong> {{ order.created_at|date:"d M Y" }}
-            </div>
-            <div class="col-md-2">
-                {% if order.status == 'Pending' %}
-                    <a href="{% url 'cancel_order' order.id %}" class="btn btn-outline-danger btn-sm">
-                        Cancel Order
-                    </a>
-                {% endif %}
-            </div>
+
         </div>
-    </div>
-{% empty %}
-    <div class="card page-card p-4">
-        <p class="mb-0">No orders yet.</p>
-    </div>
-{% endfor %}
+    {% empty %}
+        <div class="card page-card order-empty-card p-4 shadow-sm">
+            <p class="mb-0">No orders yet.</p>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

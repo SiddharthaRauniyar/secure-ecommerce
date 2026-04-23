@@ -3,32 +3,267 @@
 {% block title %}{{ product.name }} - EcoSecure Shop{% endblock %}
 
 {% block content %}
-<div class="row g-4">
-    <div class="col-md-6">
-        {% if product.image %}
-            <img src="{{ product.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ product.name }}">
-        {% endif %}
+<style>
+    .product-detail-shell {
+        padding: 0.5rem 0 2rem;
+    }
+
+    .detail-breadcrumb {
+        font-size: 0.9rem;
+        color: var(--eco-stone);
+        margin-bottom: 1.25rem;
+    }
+
+    .detail-breadcrumb a {
+        text-decoration: none;
+    }
+
+    .detail-image-card,
+    .detail-info-card,
+    .detail-extra-card {
+        border-radius: 22px;
+        overflow: hidden;
+    }
+
+    .detail-image-wrap {
+        background: rgba(255,255,255,0.78);
+        border: 1px solid rgba(200,188,170,0.28);
+        border-radius: 22px;
+        box-shadow: 0 12px 28px rgba(26,58,42,0.08);
+        padding: 1rem;
+    }
+
+    .detail-image {
+        width: 100%;
+        height: 460px;
+        object-fit: cover;
+        border-radius: 18px;
+        display: block;
+        background: #fff;
+    }
+
+    .detail-info-card {
+        background: rgba(255,255,255,0.76);
+        border: 1px solid rgba(200,188,170,0.3);
+        box-shadow: 0 12px 30px rgba(26,58,42,0.08);
+        padding: 1.5rem;
+        height: 100%;
+    }
+
+    .detail-title {
+        font-size: 2.2rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .detail-category {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.38rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(45,90,61,0.12);
+        color: var(--eco-moss);
+        font-size: 0.78rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+    }
+
+    .detail-description {
+        color: var(--eco-stone);
+        font-size: 0.98rem;
+        line-height: 1.8;
+        margin-bottom: 1.25rem;
+    }
+
+    .detail-price {
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: var(--eco-bark);
+        margin-bottom: 1rem;
+    }
+
+    .stock-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 0.42rem 0.85rem;
+        font-size: 0.76rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 1.1rem;
+    }
+
+    .stock-in {
+        background: rgba(45,90,61,0.14);
+        color: var(--eco-moss);
+    }
+
+    .stock-low {
+        background: rgba(240,196,25,0.18);
+        color: #8a6a00;
+    }
+
+    .stock-out {
+        background: rgba(139,58,42,0.14);
+        color: #8b3a2a;
+    }
+
+    .detail-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.9rem;
+        margin-bottom: 1.4rem;
+    }
+
+    .detail-meta-box {
+        background: rgba(255,255,255,0.55);
+        border: 1px solid rgba(164,150,130,0.18);
+        border-radius: 16px;
+        padding: 0.9rem 1rem;
+    }
+
+    .detail-meta-label {
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--eco-stone);
+        margin-bottom: 0.3rem;
+    }
+
+    .detail-meta-value {
+        color: var(--eco-charcoal);
+        font-weight: 500;
+    }
+
+    .detail-actions {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        margin-top: 0.8rem;
+    }
+
+    .detail-actions .btn {
+        min-width: 170px;
+    }
+
+    .detail-extra-card {
+        margin-top: 1.5rem;
+        background: linear-gradient(135deg, rgba(212,230,219,0.55), rgba(245,240,232,0.92));
+        border: 1px solid rgba(164,150,130,0.22);
+        box-shadow: 0 10px 24px rgba(26,58,42,0.06);
+        padding: 1.35rem;
+    }
+
+    .extra-title {
+        margin-bottom: 0.9rem;
+        font-size: 1.35rem;
+    }
+
+    .extra-list {
+        margin: 0;
+        padding-left: 1.2rem;
+        color: var(--eco-stone);
+    }
+
+    .extra-list li {
+        margin-bottom: 0.45rem;
+    }
+
+    @media (max-width: 991px) {
+        .detail-image {
+            height: 340px;
+        }
+
+        .detail-title {
+            font-size: 1.8rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .detail-meta-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container product-detail-shell">
+
+    <div class="detail-breadcrumb">
+        <a href="{% url 'home' %}">Home</a>
+        <span> / </span>
+        <span>{{ product.name }}</span>
     </div>
 
-    <div class="col-md-6">
-        <div class="card page-card p-4">
-            <h2 class="fw-bold">{{ product.name }}</h2>
-            <p class="text-muted mt-2">{{ product.description }}</p>
-            <p><strong>Price:</strong> ${{ product.price }}</p>
-            <p><strong>Stock:</strong> {{ product.stock_quantity }}</p>
-            <p><strong>Category:</strong> {{ product.category.name }}</p>
-
-            <div class="d-flex gap-2 mt-3 flex-wrap">
-                {% if product.stock_quantity <= 0 %}
-                    <button class="btn btn-danger" disabled>Out of Stock</button>
-                {% elif user.is_authenticated %}
-                    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-success">Add to Cart</a>
+    <div class="row g-4 align-items-start">
+        <div class="col-lg-6">
+            <div class="detail-image-wrap">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="detail-image" alt="{{ product.name }}">
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-success">Login to Add to Cart</a>
+                    <img src="https://via.placeholder.com/700x500?text=No+Image" class="detail-image" alt="No image available">
                 {% endif %}
-                <a href="{% url 'home' %}" class="btn btn-secondary">Back to Products</a>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card detail-info-card">
+                <span class="detail-category">{{ product.category.name }}</span>
+
+                <h2 class="detail-title">{{ product.name }}</h2>
+
+                <p class="detail-description">{{ product.description }}</p>
+
+                <div class="detail-price">${{ product.price }}</div>
+
+                {% if product.stock_quantity > 10 %}
+                    <span class="stock-pill stock-in">In Stock</span>
+                {% elif product.stock_quantity > 0 %}
+                    <span class="stock-pill stock-low">Low Stock</span>
+                {% else %}
+                    <span class="stock-pill stock-out">Out of Stock</span>
+                {% endif %}
+
+                <div class="detail-meta-grid">
+                    <div class="detail-meta-box">
+                        <div class="detail-meta-label">Stock Available</div>
+                        <div class="detail-meta-value">{{ product.stock_quantity }}</div>
+                    </div>
+
+                    <div class="detail-meta-box">
+                        <div class="detail-meta-label">Category</div>
+                        <div class="detail-meta-value">{{ product.category.name }}</div>
+                    </div>
+                </div>
+
+                <div class="detail-actions">
+                    {% if product.stock_quantity <= 0 %}
+                        <button class="btn btn-danger" disabled>Out of Stock</button>
+                    {% elif user.is_authenticated %}
+                        <a href="{% url 'add_to_cart' product.id %}" class="btn btn-success">Add to Cart</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-success">Login to Add to Cart</a>
+                    {% endif %}
+
+                    <a href="{% url 'home' %}" class="btn btn-outline-success">Back to Products</a>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="card detail-extra-card">
+        <h4 class="extra-title">Why choose this product?</h4>
+        <ul class="extra-list">
+            <li>Supports a more sustainable and eco-friendly lifestyle.</li>
+            <li>Carefully listed with product details and secure shopping options.</li>
+            <li>Protected by secure authentication, cart controls, and order management features.</li>
+        </ul>
+    </div>
+
 </div>
 {% endblock %}
