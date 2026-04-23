@@ -6,6 +6,7 @@
 <style>
     .product-detail-shell {
         padding: 0.5rem 0 2rem;
+        animation: fadeUp 0.6s ease;
     }
 
     .detail-breadcrumb {
@@ -40,6 +41,11 @@
         border-radius: 18px;
         display: block;
         background: #fff;
+        transition: transform 0.4s ease;
+    }
+
+    .detail-image:hover {
+        transform: scale(1.04);
     }
 
     .detail-info-card {
@@ -48,6 +54,7 @@
         box-shadow: 0 12px 30px rgba(26,58,42,0.08);
         padding: 1.5rem;
         height: 100%;
+        animation: cardPop 0.5s ease;
     }
 
     .detail-title {
@@ -80,6 +87,17 @@
         font-weight: 700;
         color: var(--eco-bark);
         margin-bottom: 1rem;
+        position: relative;
+    }
+
+    .detail-price::after {
+        content: "";
+        display: block;
+        width: 60%;
+        height: 2px;
+        margin-top: 6px;
+        background: linear-gradient(to right, var(--eco-sage), transparent);
+        opacity: 0.6;
     }
 
     .stock-pill {
@@ -98,11 +116,13 @@
     .stock-in {
         background: rgba(45,90,61,0.14);
         color: var(--eco-moss);
+        animation: pulseStock 2.5s infinite;
     }
 
     .stock-low {
         background: rgba(240,196,25,0.18);
         color: #8a6a00;
+        animation: pulseStock 2.5s infinite;
     }
 
     .stock-out {
@@ -146,6 +166,11 @@
 
     .detail-actions .btn {
         min-width: 170px;
+        transition: all 0.2s ease;
+    }
+
+    .detail-actions .btn:hover {
+        transform: translateY(-2px);
     }
 
     .detail-extra-card {
@@ -154,6 +179,7 @@
         border: 1px solid rgba(164,150,130,0.22);
         box-shadow: 0 10px 24px rgba(26,58,42,0.06);
         padding: 1.35rem;
+        animation: fadeUp 0.8s ease;
     }
 
     .extra-title {
@@ -169,6 +195,37 @@
 
     .extra-list li {
         margin-bottom: 0.45rem;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(18px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes cardPop {
+        from {
+            opacity: 0;
+            transform: scale(0.97);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes pulseStock {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.75;
+        }
     }
 
     @media (max-width: 991px) {

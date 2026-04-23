@@ -127,7 +127,7 @@
         height: 100%;
         border-radius: 20px;
         overflow: hidden;
-        transition: transform 0.22s ease, box-shadow 0.22s ease;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
         position: relative;
     }
 
@@ -236,6 +236,14 @@
         flex-wrap: wrap;
     }
 
+    .product-actions .btn {
+        transition: all 0.2s ease;
+    }
+
+    .product-actions .btn:hover {
+        transform: translateY(-2px);
+    }
+
     .promo-panel {
         background: linear-gradient(135deg, rgba(212,230,219,0.6), rgba(245,240,232,0.88));
         border: 1px solid rgba(164,150,130,0.2);
@@ -300,12 +308,12 @@
     <!-- Filter Panel -->
     <div class="filter-panel">
         <form method="GET" class="row g-3 align-items-end">
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <label class="form-label">Search Products</label>
                 <input type="text" name="q" class="form-control" placeholder="Search products..." value="{{ request.GET.q }}">
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="form-label">Category</label>
                 <select name="category" class="form-select">
                     <option value="">All Categories</option>
@@ -318,7 +326,17 @@
             </div>
 
             <div class="col-md-3">
-                <button type="submit" class="btn btn-success w-100">Filter Products</button>
+                <label class="form-label">Sort By</label>
+                <select name="sort" class="form-select">
+                    <option value="">Default</option>
+                    <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success w-100">Filter</button>
             </div>
         </form>
     </div>
@@ -388,10 +406,15 @@
                             <a href="{% url 'product_detail' product.id %}" class="btn btn-success flex-grow-1">
                                 View Details
                             </a>
+
                             {% if product.stock_quantity > 0 %}
                                 <a href="{% url 'add_to_cart' product.id %}" class="btn btn-outline-success">
                                     Add to Cart
                                 </a>
+                            {% else %}
+                                <button class="btn btn-outline-secondary" disabled>
+                                    Out of Stock
+                                </button>
                             {% endif %}
                         </div>
                     </div>
@@ -402,7 +425,7 @@
             <div class="col-12">
                 <div class="empty-state">
                     <h4 class="mb-2">No products found</h4>
-                    <p class="mb-0 text-muted">Try changing your search or category filter.</p>
+                    <p class="mb-0 text-muted">Try changing your search, category, or sorting filter.</p>
                 </div>
             </div>
         {% endfor %}

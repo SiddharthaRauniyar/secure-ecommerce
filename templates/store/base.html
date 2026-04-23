@@ -120,6 +120,28 @@
             border-color: rgba(255,255,255,0.2) !important;
         }
 
+        /* ── Added small improvements ── */
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            font-size: 0.7rem;
+        }
+
+        .dropdown-menu {
+            border-radius: 14px;
+            border: 1px solid rgba(200,188,170,0.3);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--eco-mist);
+        }
+
+        .btn {
+            transition: all 0.2s ease;
+        }
+
         /* ── Alerts ── */
         .alert-info {
             background-color: var(--eco-mist) !important;
@@ -340,17 +362,35 @@
         <div class="collapse navbar-collapse" id="mainNav">
             <div class="ms-auto d-flex align-items-center gap-2 flex-wrap">
                 <a class="btn btn-light btn-sm" href="{% url 'home' %}">Home</a>
-                <a class="btn btn-light btn-sm" href="{% url 'cart' %}">Cart</a>
+
+                <a class="btn btn-light btn-sm position-relative" href="{% url 'cart' %}">
+                    Cart
+                    {% if cart_count %}
+                        <span class="badge bg-danger cart-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
 
                 {% if user.is_authenticated %}
-                    <a class="btn btn-light btn-sm" href="{% url 'orders' %}">My Orders</a>
-
                     {% if user.is_staff %}
                         <a class="btn btn-warning btn-sm" href="{% url 'admin_dashboard' %}">Dashboard</a>
                     {% endif %}
 
-                    <span class="text-white small">Hello, {{ user.username }}</span>
-                    <a class="btn btn-outline-light btn-sm" href="{% url 'logout' %}">Logout</a>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ user.username }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'orders' %}">My Orders</a></li>
+
+                            {% if user.is_staff %}
+                                <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+                            {% endif %}
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a></li>
+                        </ul>
+                    </div>
                 {% else %}
                     <a class="btn btn-light btn-sm" href="{% url 'login' %}">Login</a>
                     <a class="btn btn-outline-light btn-sm" href="{% url 'register' %}">Register</a>

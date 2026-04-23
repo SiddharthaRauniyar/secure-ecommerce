@@ -3,6 +3,7 @@
 {% block title %}Manage Orders - EcoSecure Shop{% endblock %}
 
 {% block content %}
+
 <style>
     .orders-shell {
         padding: 1rem 0 2rem;
@@ -29,93 +30,77 @@
     }
 
     .glass-panel {
-        background: rgba(255, 255, 255, 0.72);
+        background: rgba(255,255,255,0.72);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.32);
         border-radius: 20px;
-        box-shadow: 0 12px 30px rgba(26, 58, 42, 0.10);
-    }
-
-    .orders-panel {
-        padding: 1.25rem;
-    }
-
-    .orders-table {
-        margin-bottom: 0;
-    }
-
-    .orders-table thead th {
-        font-size: 0.74rem !important;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--eco-stone) !important;
-        border-top: 0 !important;
-        background: transparent !important;
-        white-space: nowrap;
-    }
-
-    .orders-table tbody td {
-        vertical-align: middle;
-    }
-
-    .order-id {
-        font-weight: 700;
-        color: var(--eco-forest);
+        padding: 1.2rem;
+        border: 1px solid rgba(255,255,255,0.35);
+        box-shadow: 0 10px 25px rgba(26, 58, 42, 0.08);
     }
 
     .status-pill {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 999px;
-        padding: 0.38rem 0.8rem;
-        font-size: 0.72rem;
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 12px;
         font-weight: 500;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
     }
 
-    .status-pending {
-        background: rgba(240, 196, 25, 0.18);
-        color: #8a6a00;
+    .pending {
+        background: #fff3cd;
+        color: #856404;
     }
 
-    .status-completed {
-        background: rgba(45, 90, 61, 0.16);
-        color: var(--eco-moss);
+    .completed {
+        background: #d4edda;
+        color: #155724;
     }
 
-    .status-cancelled {
-        background: rgba(139, 58, 42, 0.14);
-        color: #8b3a2a;
+    .cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .search-box {
+        max-width: 320px;
+    }
+
+    .orders-table thead th {
+        white-space: nowrap;
+    }
+
+    .order-id {
+        color: var(--eco-forest);
+        font-weight: 700;
+    }
+
+    .customer-cell {
+        min-width: 150px;
     }
 
     .address-cell {
-        min-width: 220px;
-        max-width: 260px;
+        max-width: 240px;
         white-space: normal;
         line-height: 1.45;
-        color: var(--eco-charcoal);
     }
 
     .date-cell {
         white-space: nowrap;
-        color: var(--eco-stone);
-        font-size: 0.9rem;
     }
 
     .update-form {
-        min-width: 210px;
+        min-width: 190px;
     }
 
-    .update-form .form-select {
-        min-width: 130px;
-    }
-
-    .soft-note {
+    .empty-state {
+        text-align: center;
+        padding: 2rem 1rem;
         color: var(--eco-stone);
-        font-size: 0.92rem;
     }
 
     @media (max-width: 768px) {
@@ -123,8 +108,13 @@
             font-size: 1.6rem;
         }
 
-        .orders-panel {
-            padding: 1rem;
+        .search-box {
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .update-form {
+            min-width: 160px;
         }
     }
 </style>
@@ -134,21 +124,52 @@
     <div class="orders-topbar">
         <div>
             <h2 class="orders-title">Manage Orders</h2>
-            <p class="orders-subtitle">Review customer orders, shipping addresses, and update order status.</p>
+            <p class="orders-subtitle">Track and update all customer orders</p>
         </div>
-        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-dark btn-sm">← Back to Dashboard</a>
+
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-dark btn-sm">
+            Back to Dashboard
+        </a>
     </div>
 
-    <div class="glass-panel orders-panel">
+    <!-- SEARCH -->
+    <div class="glass-panel mb-3">
+        <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
+            <input
+                type="text"
+                name="q"
+                value="{{ request.GET.q }}"
+                placeholder="Search order ID or username..."
+                class="form-control search-box"
+            >
+
+            <select name="status" class="form-select w-auto">
+                <option value="">All Status</option>
+                <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Completed" {% if request.GET.status == 'Completed' %}selected{% endif %}>Completed</option>
+                <option value="Cancelled" {% if request.GET.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+            </select>
+
+            <button type="submit" class="btn btn-success btn-sm">Filter</button>
+
+            {% if request.GET.q or request.GET.status %}
+                <a href="{% url 'admin_orders' %}" class="btn btn-outline-secondary btn-sm">Reset</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="glass-panel">
         <div class="table-responsive">
-            <table class="table table-hover align-middle orders-table">
+            <table class="table table-hover align-middle orders-table mb-0">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>User</th>
+                        <th>Customer</th>
                         <th>Status</th>
                         <th>Total</th>
-                        <th>Shipping Address</th>
+                        <th>Address</th>
                         <th>Date</th>
                         <th>Update</th>
                     </tr>
@@ -160,30 +181,33 @@
 
                         <td>{{ order.user.username }}</td>
 
+                        <td class="customer-cell">
+                            <div>{{ order.customer_name|default:"N/A" }}</div>
+                            <small class="text-muted">{{ order.phone|default:"" }}</small>
+                        </td>
+
                         <td>
                             {% if order.status == 'Pending' %}
-                                <span class="status-pill status-pending">Pending</span>
+                                <span class="status-pill pending">Pending</span>
                             {% elif order.status == 'Completed' %}
-                                <span class="status-pill status-completed">Completed</span>
+                                <span class="status-pill completed">Completed</span>
                             {% else %}
-                                <span class="status-pill status-cancelled">Cancelled</span>
+                                <span class="status-pill cancelled">Cancelled</span>
                             {% endif %}
                         </td>
 
-                        <td><strong>£{{ order.total_amount }}</strong></td>
+                        <td><strong>${{ order.total_amount }}</strong></td>
 
                         <td class="address-cell">
                             {{ order.shipping_address }}
                         </td>
 
-                        <td class="date-cell">
-                            {{ order.created_at|date:"Y-m-d H:i" }}
-                        </td>
+                        <td class="date-cell">{{ order.created_at|date:"d M Y" }}</td>
 
                         <td>
                             <form method="POST" action="{% url 'update_order_status' order.id %}" class="update-form">
                                 {% csrf_token %}
-                                <div class="d-flex gap-2 flex-wrap">
+                                <div class="d-flex gap-1 flex-wrap">
                                     <select name="status" class="form-select form-select-sm">
                                         <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
                                         <option value="Completed" {% if order.status == 'Completed' %}selected{% endif %}>Completed</option>
@@ -196,8 +220,10 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center soft-note py-4">
-                            No orders available yet.
+                        <td colspan="8">
+                            <div class="empty-state">
+                                No orders available.
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -207,4 +233,5 @@
     </div>
 
 </div>
+
 {% endblock %}

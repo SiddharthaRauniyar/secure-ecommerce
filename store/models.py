@@ -51,6 +51,14 @@ class Order(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    customer_name = models.CharField(max_length=150, blank=True, default='')
+    email = models.EmailField(blank=True, default='')
+    phone = models.CharField(max_length=20, blank=True, default='')
+    city = models.CharField(max_length=100, blank=True, default='')
+    postcode = models.CharField(max_length=20, blank=True, default='')
+    country = models.CharField(max_length=100, blank=True, default='')
+    notes = models.TextField(blank=True, null=True)
+
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     shipping_address = models.TextField()

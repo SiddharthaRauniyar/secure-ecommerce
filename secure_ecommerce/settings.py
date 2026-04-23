@@ -10,9 +10,9 @@ load_dotenv(BASE_DIR / ".env")
 
 # SECURITY
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key")
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ['*']  # OK for deployment/demo
+ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
@@ -20,7 +20,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # APPLICATIONS
 INSTALLED_APPS = [
-    'jazzmin',  # 🔥 MUST BE FIRST
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,6 +56,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'store.context_processors.cart_count',
             ],
         },
     },
@@ -108,19 +109,18 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
+
 # MEDIA FILES
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# EMAIL CONFIG (SECURE FROM .env)
+# EMAIL CONFIG
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # AUTH REDIRECTS
@@ -136,7 +136,7 @@ X_FRAME_OPTIONS = 'DENY'
 # DEFAULT PRIMARY KEY
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# 🔥 JAZZMIN SETTINGS (MODERN ADMIN UI)
+# JAZZMIN SETTINGS
 JAZZMIN_SETTINGS = {
     "site_title": "EcoSecure Admin",
     "site_header": "EcoSecure Shop Admin",

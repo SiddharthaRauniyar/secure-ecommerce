@@ -3,115 +3,94 @@
 {% block title %}My Orders - EcoSecure Shop{% endblock %}
 
 {% block content %}
+
 <style>
     .orders-page-title {
-        font-size: 2.1rem;
-        margin-bottom: 1.5rem;
+        font-size: 2.2rem;
+        margin-bottom: 1.8rem;
     }
 
     .order-card {
-        border-radius: 20px;
+        border-radius: 22px;
         overflow: hidden;
     }
 
     .order-header {
-        padding-bottom: 1rem;
+        padding-bottom: 1.2rem;
         border-bottom: 1px solid rgba(0,0,0,0.08);
-        margin-bottom: 1rem;
+        margin-bottom: 1.2rem;
     }
 
     .order-meta strong {
-        display: block;
-        font-size: 0.78rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.07em;
         color: var(--eco-stone);
-        margin-bottom: 0.2rem;
     }
 
-    .order-meta span,
-    .order-meta div {
-        color: var(--eco-charcoal);
+    .order-meta span {
         font-size: 0.95rem;
+        color: var(--eco-charcoal);
     }
 
-    .order-address-box {
+    .order-address-box,
+    .order-customer-box {
         background: rgba(255,255,255,0.55);
         border: 1px solid rgba(164,150,130,0.18);
-        border-radius: 14px;
-        padding: 0.9rem 1rem;
+        border-radius: 16px;
+        padding: 1rem;
         margin-bottom: 1rem;
     }
 
-    .order-address-box h6 {
-        margin-bottom: 0.35rem;
-        font-size: 0.95rem;
-    }
-
-    .order-items-table {
-        margin-bottom: 0;
-    }
-
-    .order-items-table thead th {
-        font-size: 0.74rem !important;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--eco-stone) !important;
-        background: transparent !important;
-        border-top: 0 !important;
+    .order-customer-box {
+        background: rgba(212,230,219,0.15);
     }
 
     .order-product-cell {
         display: flex;
         align-items: center;
-        gap: 0.9rem;
-        min-width: 220px;
+        gap: 1rem;
     }
 
     .order-product-image {
         width: 64px;
         height: 64px;
-        object-fit: cover;
         border-radius: 12px;
-        border: 1px solid rgba(164,150,130,0.18);
-        background: #fff;
-        flex-shrink: 0;
-    }
-
-    .order-product-info {
-        display: flex;
-        flex-direction: column;
+        object-fit: cover;
     }
 
     .order-product-name {
         font-weight: 600;
         color: var(--eco-forest);
-        margin-bottom: 0.15rem;
     }
 
-    .order-product-desc {
-        font-size: 0.82rem;
-        color: var(--eco-stone);
-        line-height: 1.4;
+    .status-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
     }
 
-    .order-summary-note {
-        color: var(--eco-stone);
-        font-size: 0.92rem;
+    .status-pending {
+        background: rgba(255,193,7,0.2);
+        color: #856404;
     }
 
-    .order-empty-card {
-        border-radius: 18px;
+    .status-completed {
+        background: rgba(40,167,69,0.2);
+        color: #155724;
     }
 
-    @media (max-width: 768px) {
-        .orders-page-title {
-            font-size: 1.7rem;
-        }
+    .status-cancelled {
+        background: rgba(220,53,69,0.2);
+        color: #721c24;
+    }
 
-        .order-product-cell {
-            min-width: 180px;
-        }
+    .empty-orders {
+        text-align: center;
+        padding: 3rem;
     }
 </style>
 
@@ -119,65 +98,75 @@
     <h2 class="orders-page-title fw-bold">Your Orders</h2>
 
     {% for order in orders %}
-        <div class="card page-card order-card p-4 mb-4 shadow-sm">
+        <div class="card page-card order-card p-4 mb-4">
 
-            <!-- Order Header -->
-            <div class="order-header">
-                <div class="row g-3 align-items-start">
-                    <div class="col-md-3 col-sm-6 order-meta">
-                        <strong>Order ID</strong>
-                        <span>#{{ order.id }}</span>
-                    </div>
+            <!-- HEADER -->
+            <div class="order-header row align-items-center">
+                <div class="col-md-3 order-meta">
+                    <strong>Order ID</strong>
+                    <span>#{{ order.id }}</span>
+                </div>
 
-                    <div class="col-md-3 col-sm-6 order-meta">
-                        <strong>Total</strong>
-                        <span>${{ order.total_amount }}</span>
-                    </div>
+                <div class="col-md-3 order-meta">
+                    <strong>Total</strong>
+                    <span>${{ order.total_amount }}</span>
+                </div>
 
-                    <div class="col-md-2 col-sm-6 order-meta">
-                        <strong>Status</strong>
-                        <div>
-                            {% if order.status == 'Completed' %}
-                                <span class="badge bg-success">{{ order.status }}</span>
-                            {% elif order.status == 'Cancelled' %}
-                                <span class="badge bg-danger">{{ order.status }}</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">{{ order.status }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
+                <div class="col-md-2 order-meta">
+                    <strong>Status</strong><br>
+                    {% if order.status == 'Completed' %}
+                        <span class="status-badge status-completed">{{ order.status }}</span>
+                    {% elif order.status == 'Cancelled' %}
+                        <span class="status-badge status-cancelled">{{ order.status }}</span>
+                    {% else %}
+                        <span class="status-badge status-pending">{{ order.status }}</span>
+                    {% endif %}
+                </div>
 
-                    <div class="col-md-2 col-sm-6 order-meta">
-                        <strong>Date</strong>
-                        <span>{{ order.created_at|date:"d M Y" }}</span>
-                    </div>
+                <div class="col-md-2 order-meta">
+                    <strong>Date</strong>
+                    <span>{{ order.created_at|date:"d M Y" }}</span>
+                </div>
 
-                    <div class="col-md-2 col-sm-12 text-md-end">
-                        {% if order.status == 'Pending' %}
-                            <a href="{% url 'cancel_order' order.id %}" class="btn btn-outline-danger btn-sm">
-                                Cancel Order
-                            </a>
-                        {% endif %}
-                    </div>
+                <div class="col-md-2 text-md-end mt-2 mt-md-0">
+                    {% if order.status == 'Pending' %}
+                        <a href="{% url 'cancel_order' order.id %}" class="btn btn-outline-danger btn-sm">
+                            Cancel
+                        </a>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- Shipping Address -->
+            <!-- CUSTOMER DETAILS -->
+            <div class="order-customer-box">
+                <h6>Customer Details</h6>
+                <div><strong>Name:</strong> {{ order.customer_name }}</div>
+                <div><strong>Email:</strong> {{ order.email }}</div>
+                <div><strong>Phone:</strong> {{ order.phone }}</div>
+            </div>
+
+            <!-- SHIPPING -->
             <div class="order-address-box">
                 <h6>Shipping Address</h6>
-                <div class="order-summary-note">
-                    {{ order.shipping_address }}
-                </div>
+                <div>{{ order.shipping_address }}</div>
             </div>
 
-            <!-- Ordered Items -->
+            <!-- NOTES -->
+            {% if order.notes %}
+                <div class="order-address-box">
+                    <h6>Notes</h6>
+                    <div>{{ order.notes }}</div>
+                </div>
+            {% endif %}
+
+            <!-- ITEMS -->
             <div class="table-responsive">
-                <table class="table table-hover align-middle order-items-table">
+                <table class="table align-middle">
                     <thead>
                         <tr>
                             <th>Product</th>
-                            <th>Unit Price</th>
-                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Qty</th>
                             <th>Subtotal</th>
                         </tr>
                     </thead>
@@ -187,29 +176,16 @@
                                 <td>
                                     <div class="order-product-cell">
                                         {% if item.product.image %}
-                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="order-product-image">
-                                        {% else %}
-                                            <img src="https://via.placeholder.com/64x64?text=No+Image" alt="No image" class="order-product-image">
+                                            <img src="{{ item.product.image.url }}" class="order-product-image">
                                         {% endif %}
-
-                                        <div class="order-product-info">
-                                            <div class="order-product-name">{{ item.product.name }}</div>
-                                            <div class="order-product-desc">
-                                                {{ item.product.description|truncatewords:10 }}
-                                            </div>
+                                        <div class="order-product-name">
+                                            {{ item.product.name }}
                                         </div>
                                     </div>
                                 </td>
-
                                 <td>${{ item.unit_price }}</td>
                                 <td>{{ item.quantity }}</td>
                                 <td>${{ item.subtotal }}</td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center order-summary-note py-3">
-                                    No items found for this order.
-                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -217,10 +193,16 @@
             </div>
 
         </div>
+
     {% empty %}
-        <div class="card page-card order-empty-card p-4 shadow-sm">
-            <p class="mb-0">No orders yet.</p>
+        <div class="card page-card empty-orders">
+            <h4>No Orders Yet</h4>
+            <p class="text-muted">Start shopping to place your first order.</p>
+            <a href="{% url 'home' %}" class="btn btn-success mt-3">
+                Shop Now
+            </a>
         </div>
     {% endfor %}
 </div>
+
 {% endblock %}

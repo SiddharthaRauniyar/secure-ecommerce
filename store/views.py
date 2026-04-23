@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.http import JsonResponse
 
 from .forms import RegisterForm
 from .models import Product, Category, Cart, CartItem, Order, OrderItem
@@ -13,8 +14,9 @@ def is_admin(user):
 
 
 def home(request):
-    query = request.GET.get('q')
-    category_id = request.GET.get('category')
+    query = request.GET.get('q', '').strip()
+    category_id = request.GET.get('category', '').strip()
+    sort = request.GET.get('sort', '').strip()
 
     products = Product.objects.all()
     categories = Category.objects.all()
@@ -24,6 +26,13 @@ def home(request):
 
     if category_id:
         products = products.filter(category_id=category_id)
+
+    if sort == 'price_low':
+        products = products.order_by('price')
+    elif sort == 'price_high':
+        products = products.order_by('-price')
+    elif sort == 'newest':
+        products = products.order_by('-created_at')
 
     return render(request, 'store/home.html', {
         'products': products,
@@ -113,7 +122,7 @@ def add_to_cart(request, product_id):
 @login_required
 def cart_view(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
-    items = CartItem.objects.select_related('product').filter(cart=cart)
+    items = CartItem.objects.select_related('product', 'product__category').filter(cart=cart)
 
     total = sum(item.subtotal() for item in items)
 
@@ -127,24 +136,61 @@ def cart_view(request):
 def update_cart(request, item_id):
     item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
 
-    if request.method == 'POST':
-        try:
-            quantity = int(request.POST.get('quantity', 1))
+    if request.method != 'POST':
+        return redirect('cart')
 
-            if quantity <= 0:
-                messages.error(request, 'Quantity must be greater than 0.')
-                return redirect('cart')
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
-            if quantity > item.product.stock_quantity:
-                messages.error(request, 'Requested quantity exceeds available stock.')
-                return redirect('cart')
+    try:
+        quantity = int(request.POST.get('quantity', 1))
 
-            item.quantity = quantity
-            item.save()
-            messages.success(request, 'Cart updated successfully.')
+        if quantity <= 0:
+            if is_ajax:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Quantity must be greater than 0.'
+                }, status=400)
 
-        except ValueError:
-            messages.error(request, 'Invalid quantity.')
+            messages.error(request, 'Quantity must be greater than 0.')
+            return redirect('cart')
+
+        if quantity > item.product.stock_quantity:
+            if is_ajax:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Requested quantity exceeds available stock.',
+                    'available_stock': item.product.stock_quantity
+                }, status=400)
+
+            messages.error(request, 'Requested quantity exceeds available stock.')
+            return redirect('cart')
+
+        item.quantity = quantity
+        item.save()
+
+        cart = item.cart
+        items = CartItem.objects.select_related('product').filter(cart=cart)
+        cart_total = sum(cart_item.subtotal() for cart_item in items)
+
+        if is_ajax:
+            return JsonResponse({
+                'success': True,
+                'message': 'Cart updated successfully.',
+                'item_subtotal': str(item.subtotal()),
+                'cart_total': str(cart_total),
+                'item_id': item.id
+            })
+
+        messages.success(request, 'Cart updated successfully.')
+
+    except ValueError:
+        if is_ajax:
+            return JsonResponse({
+                'success': False,
+                'message': 'Invalid quantity.'
+            }, status=400)
+
+        messages.error(request, 'Invalid quantity.')
 
     return redirect('cart')
 
@@ -166,28 +212,51 @@ def checkout(request):
         messages.warning(request, "Your cart is empty.")
         return redirect('cart')
 
+    for item in items:
+        if item.quantity <= 0:
+            messages.error(request, f"Invalid quantity for {item.product.name}.")
+            return redirect('cart')
+
+        if item.quantity > item.product.stock_quantity:
+            messages.error(
+                request,
+                f"Insufficient stock for {item.product.name}."
+            )
+            return redirect('cart')
+
     total = sum(item.subtotal() for item in items)
 
     if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        city = request.POST.get('city', '').strip()
+        postcode = request.POST.get('postcode', '').strip()
+        country = request.POST.get('country', '').strip()
         address = request.POST.get('address', '').strip()
+        notes = request.POST.get('notes', '').strip()
 
-        if not address:
-            messages.error(request, 'Shipping address is required.')
+        if not all([name, email, phone, city, postcode, country, address]):
+            messages.error(request, "All required fields must be filled.")
             return redirect('checkout')
 
-        # Stock validation before creating order
-        for item in items:
-            if item.quantity > item.product.stock_quantity:
-                messages.error(
-                    request,
-                    f"Insufficient stock for {item.product.name}. Available: {item.product.stock_quantity}"
-                )
-                return redirect('cart')
+        if '@' not in email:
+            messages.error(request, "Invalid email address.")
+            return redirect('checkout')
+
+        full_address = f"{address}, {city}, {postcode}, {country}"
 
         order = Order.objects.create(
             user=request.user,
+            customer_name=name,
+            email=email,
+            phone=phone,
+            city=city,
+            postcode=postcode,
+            country=country,
+            notes=notes,
             total_amount=total,
-            shipping_address=address,
+            shipping_address=full_address,
             status='Pending'
         )
 
@@ -199,7 +268,6 @@ def checkout(request):
                 unit_price=item.product.price
             )
 
-            # Reduce stock after successful order
             product = item.product
             product.stock_quantity -= item.quantity
             product.save()
@@ -208,12 +276,18 @@ def checkout(request):
 
         try:
             send_order_confirmation_email(request.user, order)
-            messages.success(request, 'Order placed successfully. Confirmation email sent.')
+            messages.success(request, 'Order placed successfully.')
         except Exception as e:
             print("EMAIL ERROR:", e)
-            messages.warning(request, 'Order placed successfully, but the confirmation email could not be sent.')
+            messages.warning(request, 'Order placed, but email failed.')
 
-        return render(request, 'store/order_confirmation.html', {'order': order})
+        return render(request, 'store/order_confirmation.html', {
+            'order': order,
+            'name': name,
+            'email': email,
+            'phone': phone,
+            'notes': notes
+        })
 
     return render(request, 'store/checkout.html', {
         'items': items,
@@ -223,7 +297,10 @@ def checkout(request):
 
 @login_required
 def order_history(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    orders = Order.objects.filter(user=request.user) \
+        .prefetch_related('orderitem_set__product') \
+        .order_by('-created_at')
+
     return render(request, 'store/orders.html', {'orders': orders})
 
 
@@ -238,7 +315,6 @@ def cancel_order(request, order_id):
     order.status = 'Cancelled'
     order.save()
 
-    # Restore stock when order is cancelled
     order_items = OrderItem.objects.select_related('product').filter(order=order)
     for item in order_items:
         product = item.product

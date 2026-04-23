@@ -3,36 +3,85 @@
 {% block title %}Register - EcoSecure Shop{% endblock %}
 
 {% block content %}
+
 <style>
-    .card {
-        background: rgba(255, 255, 255, 0.82) !important;
-        border: 1px solid rgba(200, 188, 170, 0.3) !important;
-        border-radius: 20px !important;
-        box-shadow: 0 2px 12px rgba(26, 58, 42, 0.10) !important;
-        padding: 2.5rem 2.25rem !important;
+    .register-wrapper {
+        max-width: 520px;
+        margin: 2rem auto 3rem;
+        position: relative;
+        animation: fadeUp 0.7s ease;
     }
 
-    .card h2 {
+    .register-wrapper::before,
+    .register-wrapper::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .register-wrapper::before {
+        width: 170px;
+        height: 170px;
+        background: rgba(74, 124, 95, 0.10);
+        top: -30px;
+        left: -40px;
+        animation: floatBlob 7s ease-in-out infinite;
+    }
+
+    .register-wrapper::after {
+        width: 130px;
+        height: 130px;
+        background: rgba(196, 169, 122, 0.10);
+        bottom: -20px;
+        right: -30px;
+        animation: floatBlob 8s ease-in-out infinite reverse;
+    }
+
+    .register-card {
+        position: relative;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.82) !important;
+        border: 1px solid rgba(200, 188, 170, 0.3) !important;
+        border-radius: 24px !important;
+        box-shadow: 0 8px 24px rgba(26, 58, 42, 0.10);
+        padding: 2.5rem 2.25rem !important;
+        backdrop-filter: blur(10px);
+        animation: cardPop 0.55s ease;
+        overflow: hidden;
+    }
+
+    .register-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--eco-moss), var(--eco-sage), var(--eco-sand));
+    }
+
+    .register-title {
+        text-align: center;
+        margin-bottom: 1.6rem;
+        position: relative;
         font-family: 'Cormorant Garamond', serif;
         font-weight: 600;
         font-size: 2rem;
         color: var(--eco-forest);
-        letter-spacing: 0.01em;
-        margin-bottom: 1.75rem;
     }
 
-    .card .alert-warning {
-        background-color: #fdf3e3 !important;
-        border: 1px solid rgba(196, 169, 122, 0.35) !important;
-        border-left: 3px solid var(--eco-sand) !important;
-        color: var(--eco-bark) !important;
-        border-radius: 8px !important;
-        font-size: 0.875rem;
-        margin-bottom: 1.25rem;
+    .register-title::after {
+        content: "";
+        display: block;
+        width: 70px;
+        height: 2px;
+        margin: 0.6rem auto 0;
+        background: linear-gradient(to right, transparent, var(--eco-sage), transparent);
+        animation: pulseLine 2.5s infinite;
     }
 
-    .card .form-label,
-    .card label {
+    .register-card label {
         display: block;
         font-size: 0.75rem;
         letter-spacing: 0.07em;
@@ -43,161 +92,199 @@
         font-family: 'DM Sans', sans-serif;
     }
 
-    .card input[type="text"],
-    .card input[type="email"],
-    .card input[type="password"] {
-        display: block;
-        width: 100%;
+    .register-card .form-control {
+        width: 100% !important;
+        display: block !important;
         background-color: rgba(255, 255, 255, 0.8) !important;
         border: 1px solid rgba(164, 150, 130, 0.35) !important;
-        border-radius: 8px !important;
+        border-radius: 10px !important;
         color: var(--eco-charcoal) !important;
         font-family: 'DM Sans', sans-serif;
-        font-size: 0.9rem !important;
+        font-size: 0.92rem !important;
         font-weight: 300;
-        padding: 0.65rem 0.9rem !important;
-        transition: border-color 200ms cubic-bezier(0.4,0,0.2,1),
-                    box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
+        padding: 0.75rem 0.95rem !important;
+        transition: all 0.2s ease;
         outline: none;
         box-sizing: border-box;
     }
 
-    .card input[type="text"]:focus,
-    .card input[type="email"]:focus,
-    .card input[type="password"]:focus {
+    .register-card .form-control:focus {
         background-color: #fff !important;
         border-color: var(--eco-sage) !important;
-        box-shadow: 0 0 0 3px rgba(74, 124, 95, 0.15) !important;
+        box-shadow: 0 0 0 4px rgba(74,124,95,0.12) !important;
+        transform: translateY(-1px);
     }
 
-    .card .helptext,
-    .card ul.errorlist,
-    .card .form-text {
+    .register-card .helptext,
+    .register-card .form-text,
+    .register-card ul {
         font-size: 0.78rem;
         color: var(--eco-stone);
         margin-top: 0.35rem;
-        font-family: 'DM Sans', sans-serif;
         line-height: 1.5;
-        list-style: none;
-        padding: 0;
     }
 
-    .card ul.errorlist li {
+    .register-card ul {
+        padding-left: 1rem;
+    }
+
+    .register-card .errorlist {
+        list-style: none;
+        padding-left: 0;
+        margin: 0.35rem 0 0;
+    }
+
+    .register-card .errorlist li {
         color: #8b3a2a;
         font-size: 0.78rem;
-        margin-top: 0.3rem;
     }
 
-    .card .btn-success {
-        background-color: var(--eco-moss) !important;
-        border-color: var(--eco-moss) !important;
+    .btn-register {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, var(--eco-moss), var(--eco-forest)) !important;
+        border: none !important;
         border-radius: 999px !important;
         font-size: 0.82rem !important;
         letter-spacing: 0.07em;
         text-transform: uppercase;
-        font-weight: 400;
+        font-weight: 500;
         font-family: 'DM Sans', sans-serif;
-        padding: 0.65rem 1.5rem !important;
+        padding: 0.75rem 1.5rem !important;
         color: #fff !important;
         width: 100%;
         margin-top: 0.75rem;
         cursor: pointer;
-        transition: background 200ms cubic-bezier(0.4,0,0.2,1),
-                    box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
-        border: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
     }
 
-    .card .btn-success:hover,
-    .card .btn-success:focus {
-        background-color: var(--eco-forest) !important;
-        box-shadow: 0 4px 14px rgba(26, 58, 42, 0.28) !important;
+    .btn-register::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -120%;
+        width: 120%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.6s ease;
     }
 
-    .card p,
-    .card .text-center {
+    .btn-register:hover::before {
+        left: 120%;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(26, 58, 42, 0.24) !important;
+        filter: brightness(1.02);
+    }
+
+    .register-footer {
         font-size: 0.875rem;
         color: var(--eco-stone);
+        text-align: center;
+        margin-top: 1.25rem;
+        margin-bottom: 0;
+        font-family: 'DM Sans', sans-serif;
+        font-weight: 300;
     }
 
-    .card a {
+    .register-footer a {
         color: var(--eco-sage);
         text-decoration: none;
-        transition: color 200ms cubic-bezier(0.4,0,0.2,1);
+        transition: color 0.2s ease;
     }
 
-    .card a:hover {
+    .register-footer a:hover {
         color: var(--eco-forest);
+    }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(18px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes cardPop {
+        from { opacity: 0; transform: scale(0.96); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes floatBlob {
+        0%,100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulseLine {
+        0%,100% { opacity: 0.6; transform: scaleX(0.95); }
+        50% { opacity: 1; transform: scaleX(1.05); }
     }
 </style>
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-7 col-lg-5">
-            <div class="card shadow-sm p-4">
-                <h2 class="text-center mb-4">Create Account</h2>
+<div class="register-wrapper">
+    <div class="register-card">
+        <h2 class="register-title">Create Account</h2>
 
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show mb-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if form.errors %}
+            <div class="alert alert-danger mb-3">
+                <strong>Please fix the following errors:</strong>
+                <ul class="mb-0 mt-2">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                        {% endfor %}
                     {% endfor %}
-                {% endif %}
-
-                {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <strong>Please fix the following errors:</strong>
-                        <ul class="mb-0 mt-2">
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-                                {% endfor %}
-                            {% endfor %}
-                            {% for error in form.non_field_errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-
-                <form method="POST" novalidate>
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-                        <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
-                        {{ form.username }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                        {{ form.email }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
-                        {{ form.password1 }}
-                        {% if form.password1.help_text %}
-                            <div class="form-text small text-muted">
-                                {{ form.password1.help_text|safe }}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="{{ form.password2.id_for_label }}" class="form-label">Password Confirmation</label>
-                        {{ form.password2 }}
-                    </div>
-
-                    <button type="submit" class="btn btn-success w-100">Register</button>
-                </form>
-
-                <p class="text-center mt-3 mb-0">
-                    Already have an account?
-                    <a href="{% url 'login' %}">Login here</a>
-                </p>
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
             </div>
-        </div>
+        {% endif %}
+
+        <form method="POST" novalidate>
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+    </div>
+
+    <div class="mb-3">
+        <label for="{{ form.email.id_for_label }}">Email</label>
+        {{ form.email }}
+    </div>
+
+    <div class="mb-3">
+        <label for="{{ form.password1.id_for_label }}">Password</label>
+        {{ form.password1 }}
+        {% if form.password1.help_text %}
+            <div class="form-text">
+                {{ form.password1.help_text|safe }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+        {{ form.password2 }}
+    </div>
+
+    <button type="submit" class="btn-register">Register</button>
+</form>
+
+        <p class="register-footer">
+            Already have an account?
+            <a href="{% url 'login' %}">Login here</a>
+        </p>
     </div>
 </div>
+
 {% endblock %}

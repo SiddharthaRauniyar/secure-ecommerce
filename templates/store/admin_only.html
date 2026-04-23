@@ -1,10 +1,86 @@
 {% extends 'store/base.html' %}
 
-{% block title %}Admin Only{% endblock %}
+{% block title %}Admin Access - EcoSecure Shop{% endblock %}
 
 {% block content %}
-<div class="card page-card p-4">
-    <h2>Admin Only Page</h2>
-    <p>This page is protected and can only be viewed by staff/admin users.</p>
+
+<style>
+.admin-only-wrapper {
+    max-width: 600px;
+    margin: 3rem auto;
+}
+
+.admin-only-card {
+    text-align: center;
+    padding: 2.5rem 2rem !important;
+    border-radius: 24px !important;
+}
+
+.admin-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1.2rem;
+    border-radius: 50%;
+    background: var(--eco-moss);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 8px 20px rgba(45, 90, 61, 0.25);
+}
+
+.admin-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.admin-subtext {
+    color: var(--eco-stone);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-note {
+    background: rgba(212,230,219,0.2);
+    border: 1px solid rgba(74,124,95,0.15);
+    border-radius: 14px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: var(--eco-charcoal);
+}
+</style>
+
+<div class="admin-only-wrapper">
+    <div class="card page-card admin-only-card">
+
+        <div class="admin-icon">
+            🔒
+        </div>
+
+        <h2 class="admin-title">Admin Only Access</h2>
+
+        <p class="admin-subtext">
+            This page is restricted to authorised staff members.
+        </p>
+
+        <div class="admin-note">
+            Only users with administrative privileges can view and manage this section of the system.
+        </div>
+
+        <div class="mt-4 d-flex justify-content-center gap-2 flex-wrap">
+            <a href="{% url 'home' %}" class="btn btn-outline-success">
+                Back to Home
+            </a>
+
+            {% if user.is_staff %}
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-success">
+                Go to Dashboard
+            </a>
+            {% endif %}
+        </div>
+
+    </div>
 </div>
+
 {% endblock %}

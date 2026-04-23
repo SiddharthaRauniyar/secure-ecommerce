@@ -55,13 +55,14 @@
     }
 
     .cart-product-image {
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
         object-fit: cover;
         border-radius: 12px;
         border: 1px solid rgba(164, 150, 130, 0.18);
         background: #fff;
         flex-shrink: 0;
+        display: block;
     }
 
     .cart-product-info {
@@ -69,7 +70,7 @@
         flex-direction: column;
     }
 
-    .cart-card .product-name {
+    .product-name {
         font-family: 'Cormorant Garamond', serif;
         font-size: 1.05rem;
         font-weight: 600;
@@ -83,14 +84,10 @@
         margin-top: 0.2rem;
     }
 
-    .cart-card .price-cell {
-        color: var(--eco-bark);
-        font-weight: 400;
-    }
-
-    .cart-card .subtotal-cell {
-        color: var(--eco-forest);
-        font-weight: 500;
+    .stock-warning {
+        font-size: 0.78rem;
+        color: #b02a37;
+        margin-top: 0.2rem;
     }
 
     .cart-card input[type="number"] {
@@ -107,7 +104,6 @@
         outline: none;
         width: 100%;
         box-sizing: border-box;
-        margin-bottom: 0.5rem;
     }
 
     .cart-card input[type="number"]:focus {
@@ -116,28 +112,18 @@
         box-shadow: 0 0 0 3px rgba(74, 124, 95, 0.15) !important;
     }
 
-    .cart-card .btn-update {
-        background-color: var(--eco-bark) !important;
-        border-color: var(--eco-bark) !important;
-        border-radius: 999px !important;
-        font-size: 0.72rem !important;
-        letter-spacing: 0.07em;
-        text-transform: uppercase;
-        font-weight: 400;
-        font-family: 'DM Sans', sans-serif;
-        padding: 0.35rem 0.85rem !important;
-        color: #fff !important;
-        width: 100%;
-        cursor: pointer;
-        transition: background 200ms cubic-bezier(0.4,0,0.2,1);
-        border: none;
+    .cart-qty {
+        min-width: 90px;
     }
 
-    .cart-card .btn-update:hover {
-        background-color: #5e4428 !important;
+    .qty-note {
+        font-size: 0.72rem;
+        color: var(--eco-stone);
+        margin-top: 0.35rem;
+        display: block;
     }
 
-    .cart-card .btn-remove {
+    .btn-remove {
         background-color: transparent !important;
         border: 1px solid rgba(139, 58, 42, 0.35) !important;
         border-radius: 999px !important;
@@ -154,7 +140,7 @@
         display: inline-block;
     }
 
-    .cart-card .btn-remove:hover {
+    .btn-remove:hover {
         background-color: #8b3a2a !important;
         border-color: #8b3a2a !important;
         color: #fff !important;
@@ -171,7 +157,7 @@
         border-top: 1px solid rgba(164, 150, 130, 0.2);
     }
 
-    .cart-footer .btn-continue {
+    .btn-continue {
         background: transparent !important;
         border: 1px solid rgba(164, 150, 130, 0.45) !important;
         border-radius: 999px !important;
@@ -187,13 +173,13 @@
         display: inline-block;
     }
 
-    .cart-footer .btn-continue:hover {
+    .btn-continue:hover {
         background: rgba(164, 150, 130, 0.12) !important;
         border-color: var(--eco-stone) !important;
         color: var(--eco-charcoal) !important;
     }
 
-    .cart-footer .btn-checkout {
+    .btn-checkout {
         background-color: var(--eco-moss) !important;
         border-color: var(--eco-moss) !important;
         border-radius: 999px !important;
@@ -210,14 +196,14 @@
         display: inline-block;
     }
 
-    .cart-footer .btn-checkout:hover {
+    .btn-checkout:hover {
         background-color: var(--eco-forest) !important;
         box-shadow: 0 4px 14px rgba(26, 58, 42, 0.28) !important;
     }
 
     .cart-total {
         font-family: 'Cormorant Garamond', serif;
-        font-size: 1.35rem;
+        font-size: 1.5rem;
         font-weight: 600;
         color: var(--eco-forest);
         letter-spacing: 0.01em;
@@ -276,7 +262,7 @@
         margin-bottom: 1.25rem;
     }
 
-    .empty-cart-card .btn-browse {
+    .btn-browse {
         background-color: var(--eco-moss) !important;
         border-color: var(--eco-moss) !important;
         border-radius: 999px !important;
@@ -293,9 +279,29 @@
         display: inline-block;
     }
 
-    .empty-cart-card .btn-browse:hover {
+    .btn-browse:hover {
         background-color: var(--eco-forest) !important;
         box-shadow: 0 4px 14px rgba(26, 58, 42, 0.28) !important;
+    }
+
+    @media (max-width: 768px) {
+        .cart-product-box {
+            min-width: unset;
+        }
+
+        .cart-product-image {
+            width: 65px;
+            height: 65px;
+        }
+
+        .cart-footer {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .summary-card {
+            max-width: 100%;
+        }
     }
 </style>
 
@@ -311,10 +317,11 @@
                         <th>Price</th>
                         <th style="width: 150px;">Quantity</th>
                         <th>Total</th>
-                        <th>Action</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
+
                     {% for item in items %}
                     <tr>
                         <td>
@@ -322,33 +329,46 @@
                                 {% if item.product.image %}
                                     <img src="{{ item.product.image.url }}" class="cart-product-image" alt="{{ item.product.name }}">
                                 {% else %}
-                                    <img src="https://via.placeholder.com/60x60?text=No+Image" class="cart-product-image" alt="No image">
+                                    <img src="https://via.placeholder.com/80x80?text=No+Image" class="cart-product-image" alt="No image">
                                 {% endif %}
 
                                 <div class="cart-product-info">
-                                    <span class="product-name">{{ item.product.name }}</span>
-                                    <span class="cart-product-category">{{ item.product.category.name }}</span>
+                                    <div class="product-name">{{ item.product.name }}</div>
+                                    <div class="cart-product-category">{{ item.product.category.name }}</div>
+
+                                    {% if item.quantity > item.product.stock_quantity %}
+                                        <div class="stock-warning">
+                                            Only {{ item.product.stock_quantity }} left in stock
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </td>
 
-                        <td><span class="price-cell">${{ item.product.price }}</span></td>
+                        <td>${{ item.product.price }}</td>
 
                         <td>
-                            <form method="POST" action="{% url 'update_cart' item.id %}">
-                                {% csrf_token %}
-                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                                <button type="submit" class="btn-update">Update</button>
-                            </form>
+                            <input
+                                type="number"
+                                class="cart-qty"
+                                data-id="{{ item.id }}"
+                                value="{{ item.quantity }}"
+                                min="1"
+                                max="{{ item.product.stock_quantity }}"
+                            >
+                            <small class="qty-note">Quantity updates automatically</small>
                         </td>
 
-                        <td><span class="subtotal-cell">${{ item.subtotal }}</span></td>
+                        <td>${{ item.subtotal }}</td>
 
                         <td>
-                            <a href="{% url 'remove_from_cart' item.id %}" class="btn-remove">Remove</a>
+                            <a href="{% url 'remove_from_cart' item.id %}" class="btn-remove">
+                                Remove
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
+
                 </tbody>
             </table>
         </div>
@@ -356,22 +376,31 @@
         <div class="cart-footer">
             <div class="d-flex gap-2 flex-wrap">
                 <a href="{% url 'home' %}" class="btn-continue">Continue Shopping</a>
-                <a href="{% url 'checkout' %}" class="btn-checkout">Proceed to Checkout</a>
+
+                {% if items %}
+                    <a href="{% url 'checkout' %}" class="btn-checkout">Proceed to Checkout</a>
+                {% endif %}
             </div>
-            <p class="cart-total mb-0">Total: <span>${{ total }}</span></p>
+
+            <p class="cart-total mb-0">
+                Total: <span>${{ total }}</span>
+            </p>
         </div>
     </div>
 
     <div class="summary-card">
         <h4>Order Summary</h4>
+
         <div class="summary-row">
             <span>Items Total</span>
             <span>${{ total }}</span>
         </div>
+
         <div class="summary-row">
             <span>Shipping</span>
-            <span>Free</span>
+            <span class="text-success">Free</span>
         </div>
+
         <div class="summary-row total-row">
             <span>Grand Total</span>
             <span>${{ total }}</span>
@@ -380,9 +409,45 @@
 
 {% else %}
     <div class="empty-cart-card">
-        <p>Your cart is empty.</p>
-        <a href="{% url 'home' %}" class="btn-browse">Browse Products</a>
+        <h4>Your cart is empty</h4>
+        <p>Browse products and add items to your cart.</p>
+
+        <a href="{% url 'home' %}" class="btn-browse">
+            Start Shopping
+        </a>
     </div>
 {% endif %}
+
+<script>
+document.querySelectorAll('.cart-qty').forEach(input => {
+    input.addEventListener('change', function () {
+        const itemId = this.dataset.id;
+        const quantity = this.value;
+
+        fetch(`/update-cart/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: `quantity=${quantity}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+                location.reload();
+            }
+        })
+        .catch(() => {
+            alert('Something went wrong.');
+            location.reload();
+        });
+    });
+});
+</script>
 
 {% endblock %}
