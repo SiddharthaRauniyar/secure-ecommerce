@@ -5,21 +5,22 @@ from dotenv import load_dotenv
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env
+# Load .env file
 load_dotenv(BASE_DIR / ".env")
 
-# SECURITY KEY
-SECRET_KEY = os.getenv("SECRET_KEY")
-
+# SECURITY
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key")
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']  # OK for deployment/demo
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
 ]
-# Applications
+
+# APPLICATIONS
 INSTALLED_APPS = [
+    'jazzmin',  # 🔥 MUST BE FIRST
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,8 +30,7 @@ INSTALLED_APPS = [
     'store',
 ]
 
-
-# Middleware
+# MIDDLEWARE
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -41,12 +41,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
-# URLs
+# URL CONFIG
 ROOT_URLCONF = 'secure_ecommerce.urls'
 
-
-# Templates
+# TEMPLATES
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -62,11 +60,10 @@ TEMPLATES = [
     },
 ]
 
-
+# WSGI
 WSGI_APPLICATION = 'secure_ecommerce.wsgi.application'
 
-
-# Database
+# DATABASE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -74,8 +71,7 @@ DATABASES = {
     }
 }
 
-
-# Password validation
+# PASSWORD VALIDATION
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -92,23 +88,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Localization
+# LANGUAGE & TIME
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
-# Static & Media
+# STATIC FILES
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# MEDIA FILES
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
-# Email (SECURE)
+# EMAIL CONFIG (SECURE FROM .env)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -119,19 +114,24 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-
-# Authentication redirects
+# AUTH REDIRECTS
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
-
-# Security settings
+# SECURITY SETTINGS
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
 X_FRAME_OPTIONS = 'DENY'
 
-
-# Default primary key
+# DEFAULT PRIMARY KEY
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# 🔥 JAZZMIN SETTINGS (MODERN ADMIN UI)
+JAZZMIN_SETTINGS = {
+    "site_title": "EcoSecure Admin",
+    "site_header": "EcoSecure Shop Admin",
+    "site_brand": "EcoSecure",
+    "welcome_sign": "Welcome to EcoSecure Dashboard",
+    "copyright": "EcoSecure 2026",
+}
